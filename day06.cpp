@@ -7,17 +7,42 @@
 #define CUT(x)
 
 using namespace std;
-int w, h;
-string grid;
+int w, h, res;
+string grid, ogrid;
 
-static void solve( int x, int y, int dir )
+static void detectLoop( int x, int y, int dir )
 {
-	grid[x + y * w] = 'X';
+	if (ogrid[x + y * w] == ">v<^"[dir]) {++res; return ;};
+	ogrid[x + y * w] = ">v<^"[dir];
 	for (int loop = 0; loop < 4; ++loop) {
 		x += !dir - (dir == 2);
 		y += (dir == 1) - (dir == 3);
 		if (x < 0 || x >= w || y < 0 || y >= h) return ;
-		if (grid[x + y * w] != '#') return solve(x, y, dir);
+		if (ogrid[x + y * w] != '#') return detectLoop(x, y, dir);
+		x -= !dir - (dir == 2);
+		y -= (dir == 1) - (dir == 3);
+		dir = (dir + 1) & 3;
+	}
+}
+
+static void solve( int x, int y, int dir, bool first )
+{
+	if (!first && grid[x + y * w] == '.') {
+		ogrid = grid;
+		ogrid[x + y * w] = '#';
+		x -= !dir - (dir == 2);
+		y -= (dir == 1) - (dir == 3);
+		ogrid[x + y * w] = '.';
+		detectLoop(x, y, dir);
+		x += !dir - (dir == 2);
+		y += (dir == 1) - (dir == 3);
+	}
+	grid[x + y * w] = ">v<^"[dir];
+	for (int loop = 0; loop < 4; ++loop) {
+		x += !dir - (dir == 2);
+		y += (dir == 1) - (dir == 3);
+		if (x < 0 || x >= w || y < 0 || y >= h) return ;
+		if (grid[x + y * w] != '#') return solve(x, y, dir, false);
 		x -= !dir - (dir == 2);
 		y -= (dir == 1) - (dir == 3);
 		dir = (dir + 1) & 3;
@@ -41,8 +66,6 @@ int main( void )
 		}
 		grid.append(line);
     }
-	solve(x, y, dir);
-	int res = 0;
-	for (auto c : grid) res += c == 'X';
+	solve(x, y, dir, true);
     OUT(res << endl);
 }
