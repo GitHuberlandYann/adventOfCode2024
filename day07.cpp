@@ -14,7 +14,8 @@ static bool valid( long total, long curr, int index, int len, vector<long>& fact
 	if (curr > total) return false;
 	if (index == len) return curr == total;
 	return valid(total, curr * factors[index], index + 1, len, factors)
-		|| valid(total, curr + factors[index], index + 1, len, factors);
+		|| valid(total, curr + factors[index], index + 1, len, factors)
+		|| valid(total, stol(to_string(curr) + to_string(factors[index])), index + 1, len, factors);
 }
 
 int main( void )
