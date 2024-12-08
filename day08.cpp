@@ -31,13 +31,12 @@ int main( void )
 		int len = vec.size();
 		for (int i = 0; i < len; ++i) {
 			auto& a = vec[i];
+			antinodes.insert(a);
 			for (int j = i + 1; j < len; ++j) {
 				auto& b = vec[j];
 				array<int, 2> diff{b[0] - a[0], b[1] - a[1]};
-				array<int, 2> aprime{a[0] - diff[0], a[1] - diff[1]};
-				array<int, 2> bprime{b[0] + diff[0], b[1] + diff[1]};
-				if (aprime[0] >= 0 && aprime[0] < w && aprime[1] >= 0 && aprime[1] < h) antinodes.insert(aprime);
-				if (bprime[0] >= 0 && bprime[0] < w && bprime[1] >= 0 && bprime[1] < h) antinodes.insert(bprime);
+				for (array<int, 2> aprime{a[0] - diff[0], a[1] - diff[1]}; aprime[0] >= 0 && aprime[0] < w && aprime[1] >= 0 && aprime[1] < h; aprime[0] -= diff[0], aprime[1] -= diff[1]) antinodes.insert(aprime);
+				for (array<int, 2> bprime{a[0] + diff[0], a[1] + diff[1]}; bprime[0] >= 0 && bprime[0] < w && bprime[1] >= 0 && bprime[1] < h; bprime[0] += diff[0], bprime[1] += diff[1]) antinodes.insert(bprime);
 			}
 		}
 	}
