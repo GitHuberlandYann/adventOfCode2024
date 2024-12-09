@@ -1,5 +1,5 @@
 #include <iostream>
-#include <array>
+#include <vector>
 #include <algorithm>
 
 #define OUT(x) cout << x
@@ -9,34 +9,50 @@
 
 using namespace std;
 
-static int parse( string& str, array<int, 100000>& storage )
+struct space { int size, type; };
+
+static void parse( string& str, vector<space>& storage )
 {
-	int id = 0, i = 0, mode = 0;
-	storage.fill(-1);
+	int id = 0, mode = 0;
 
 	for (auto c : str) {
-		if (!mode) for (int j = 0; j < c - '0'; ++j) storage[i++] = id;
-		else i += c - '0';
+		if (!mode) storage.push_back({c - '0', id});
+		else storage.push_back({c - '0', -1});
 		mode = !mode;
 		if (!mode) ++id;
 	}
-	return i;
 }
 
-static int getLast( array<int, 100000>& storage, int& end )
+static void moveMem( vector<space>& storage )
 {
-	for (--end; storage[end] == -1; --end);
-	return storage[end];
+	for (int index = storage.size() - 1; index >= 0; --index) {
+		auto [cnt, id] = storage[index];
+		if (id == -1) continue ;
+		for (int search = 0; search < index; ++search) {
+			auto [ocnt, oid] = storage[search];
+			if (oid == -1 && ocnt >= cnt) {
+				storage[index].type = -1;
+				if (cnt == ocnt) storage[search].type = id;
+				else {
+					int diff = ocnt - cnt;
+					storage[search] = {cnt, id};
+					storage.insert(storage.begin() + search + 1, space{diff, -1});
+					++index;
+				}
+				break ;
+			}
+		}
+	}
 }
 
-static long solve( array<int, 100000>& storage, int end )
+static long solve( vector<space>& storage )
 {
+	int i = 0;
 	long res = 0;
 
-	for (int start = 0; start < end; ++start) {
-		int curr = storage[start];
-		if (curr == -1) curr = getLast(storage, end);
-		res += start * curr;
+	for (auto [cnt, type] : storage) {
+		if (type == -1) i += cnt;
+		else for (int j = 0; j < cnt; ++j) res += i++ * type;
 	}
 	return res;
 }
@@ -45,7 +61,8 @@ int main( void )
 {
     string line;
     getline(cin, line);
-	array<int, 100000> storage;
-    int end = parse(line, storage);
-    OUT(solve(storage, end) << endl);
+	vector<space> storage;
+    parse(line, storage);
+	moveMem(storage);
+    OUT(solve(storage) << endl);
 }
