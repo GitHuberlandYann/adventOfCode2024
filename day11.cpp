@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <algorithm>
 
 #define OUT(x) cout << x
@@ -7,15 +8,26 @@
 #define CUT(x)
 
 using namespace std;
+map<pair<long long, int>, long> memory;
+
+static int cntDigits( long long n )
+{
+	for (long long pow = 1, cmp = 10; ; cmp *= 10, ++pow) if (n < cmp) return pow;
+}
 
 static long solve( long long n, int loop )
 {
+	if (memory.count({n, loop})) return memory[{n, loop}];
 	if (!loop) return 1;
-	if (!n) return solve(1, loop - 1);
-	auto str = to_string(n);
-	if (str.size() & 1) return solve(n * 2024, loop - 1);
-	return solve(atoi(str.substr(0, str.size() / 2).c_str()), loop - 1)
-		+ solve(atoi(str.substr(str.size() / 2).c_str()), loop - 1);
+	if (!n) return memory[{n, loop}] = solve(1, loop - 1);
+
+	int digits = cntDigits(n);
+	if (digits & 1) return memory[{n, loop}] = solve(n * 2024, loop - 1);
+	digits >>= 1;
+	long long pow = 1;
+	for (int i = 0; i < digits; ++i) pow *= 10;
+	long long a = n / pow, b = n - a * pow;
+	return memory[{n, loop}] = solve(a, loop - 1) + solve(b, loop - 1);
 }
 
 int main( void )
@@ -25,7 +37,7 @@ int main( void )
 		int stone;
 		cin >> stone;
 		cin.ignore(1, ' ');
-		res += solve(stone, 25);
+		res += solve(stone, 75);
 	}
 
     OUT(res << endl);
