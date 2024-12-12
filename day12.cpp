@@ -50,17 +50,23 @@ int main( void )
 		for (int j = 0; j < width; ++j) {
 			int curr = griid[j + i * width];
 			++regions[curr].area;
-			if (!j) ++regions[curr].perimeter;
-			if (j == width - 1) ++regions[curr].perimeter;
+			if (!j) regions[curr].perimeter += !i || griid[j + (i - 1) * width] != curr;
+			if (j == width - 1) regions[curr].perimeter += !i || griid[j + (i - 1) * width] != curr;
 			else {
 				int neighbour = griid[j + 1 + i * width];
-				if (curr != neighbour) ++regions[curr].perimeter, ++regions[neighbour].perimeter;
+				if (curr != neighbour) {
+					regions[curr].perimeter += !i || griid[j + (i - 1) * width] != curr || griid[j + 1 + (i - 1) * width] == curr;
+					regions[neighbour].perimeter += !i || griid[j + 1 + (i - 1) * width] != neighbour || griid[j + (i - 1) * width] == neighbour;
+				}
 			}
-			if (!i) ++regions[curr].perimeter;
-			if (i == height - 1) ++regions[curr].perimeter;
+			if (!i) regions[curr].perimeter += !j || griid[j - 1 + i * width] != curr;
+			if (i == height - 1) regions[curr].perimeter += !j || griid[j - 1 + i * width] != curr;
 			else {
 				int neighbour = griid[j + (i + 1) * width];
-				if (curr != neighbour) ++regions[curr].perimeter, ++regions[neighbour].perimeter;
+				if (curr != neighbour) {
+					regions[curr].perimeter += !j || griid[j - 1 + i * width] != curr || griid[j - 1 + (i + 1) * width] == curr;
+					regions[neighbour].perimeter += !j || griid[j - 1 + (i + 1) * width] != neighbour || griid[j - 1 + i * width] == neighbour;
+				}
 			}
 		}
 	}
