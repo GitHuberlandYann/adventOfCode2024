@@ -8,9 +8,9 @@
 
 using namespace std;
 
-static array<int, 2> readInput( char sep )
+static array<long, 2> readInput( char sep )
 {
-    int x, y;
+    long x, y;
     string ign;
     getline(cin, ign, sep);
     cin >> x;
@@ -23,16 +23,18 @@ static array<int, 2> readInput( char sep )
 
 int main( void )
 {
-    int res = 0;
+    long res = 0;
     while (!cin.eof()) {
         auto buttonA = readInput('+');
         auto buttonB = readInput('+');
         auto target = readInput('=');
+        target[0] += 10000000000000;
+        target[1] += 10000000000000;
         if ((target[0] * buttonA[1] - target[1] * buttonA[0]) % (buttonB[0] * buttonA[1] - buttonB[1] * buttonA[0])) continue ;
-        int cntB = (target[0] * buttonA[1] - target[1] * buttonA[0]) / (buttonB[0] * buttonA[1] - buttonB[1] * buttonA[0]);
+        long cntB = (target[0] * buttonA[1] - target[1] * buttonA[0]) / (buttonB[0] * buttonA[1] - buttonB[1] * buttonA[0]);
         if ((target[1] - cntB * buttonB[1]) % buttonA[1]) continue ;
-        int cntA = (target[1] - cntB * buttonB[1]) / buttonA[1];
-        if (cntA > 100 || cntB > 100) continue ;
+        long cntA = (target[1] - cntB * buttonB[1]) / buttonA[1];
+        //if (cntA > 100 || cntB > 100) continue ;
         res += cntA * 3 + cntB;
         /*
         cntA * buttonA[0] + cntB * buttonB[0] = target[0];
