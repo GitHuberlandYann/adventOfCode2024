@@ -14,27 +14,30 @@ int main( void )
 {
 	const int width = 101;
 	const int height = 103;
-	long tr = 0, tl = 0, br = 0, bl = 0;
 	string skp;
+	vector<robot> robots;
     while (!cin.eof()) {
 		robot rob; getline(cin, skp, '=');
 		cin >> rob.x; cin.ignore(1, ' ');
 		cin >> rob.y; getline(cin, skp, '=');
 		cin >> rob.dx; cin.ignore(1, ' ');
 		cin >> rob.dy; cin.ignore();
-		rob.x = (rob.x + rob.dx * 100) % width;
-		rob.y = (rob.y + rob.dy * 100) % height;
-		while (rob.x < 0) rob.x += width;
-		while (rob.y < 0) rob.y += height;
-		if (rob.x == width / 2 || rob.y == height / 2) continue ;
-		int quadrant = (rob.x < width / 2 ? 1 : 2) + (rob.y < height / 2 ? 4 : 8);
-		switch (quadrant) {
-			case 0b0101: ++tl; break ;
-			case 0b0110: ++tr; break ;
-			case 0b1001: ++bl; break ;
-			case 0b1010: ++br; break ;
+		robots.push_back(rob);
+	}
+
+	// part 2 sucked ass.
+	for (int time = 1; time <= 10000; ++time) {
+		string grid(width * height, '.');
+		for (auto& rob : robots) {
+			rob.x += rob.dx;
+			rob.y += rob.dy;
+			if (rob.x < 0) rob.x += width;
+			else if (rob.x >= width) rob.x -= width;
+			if (rob.y < 0) rob.y += height;
+			else if (rob.y >= height) rob.y -= height;
+			grid[rob.x + rob.y * width] = '#';
 		}
+		LOGND("TIME " << time);
+		for (int i = 0; i < height; ++i) LOGND(grid.substr(i * width, width));
     }
-	LOGND("tr " << tr << " tl " << tl << " br " << br << " bl " << bl);
-    OUT(tr * tl * br * bl << endl);
 }
