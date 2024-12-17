@@ -22,6 +22,18 @@ static long combo( int operand, array<long, 3>& reg )
 	return reg[operand - 4];
 }
 
+static bool validEntry( long regA, int target = 2 )
+{
+	// Program: 2,4,1,1,7,5,1,5,4,0,0,3,5,5,3,0
+	long regB = regA & 7;         // 2 4
+	regB ^= 1;                    // 1 1
+	long regC = regA >> regB;     // 7 5
+	regB ^= 0b101;                // 1 5
+	regB ^= regC;                 // 4 0
+	regA >>= 3;                   // 0 3
+	return (regB & 7) == target;  // 5 5
+}
+
 static bool outputsItself( long regA, vector<int>& program, int progSize )
 {
 	LOGND("outputsItself " << regA);
