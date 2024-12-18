@@ -11,22 +11,35 @@
 using namespace std;
 const int width = 71;
 const int bytes = 1024;
-string grid(width * width, '.');
+string grid(width * width, '.'), ogrid;
 
-static void solve( int x, int y, int steps, vector<array<int, 2>>& next )
+static bool solve( int x, int y, int steps, vector<array<int, 2>>& next )
 {
-	if (grid[x + y * width] != '.') return ;
+	if (ogrid[x + y * width] != '.') return false;
 	if (x == width - 1 && y == width - 1) {
 		OUT("exit reached in " << steps << " steps" << endl);
-		grid[x + y * width] = 'X';
-		for (int i = 0; i < width; ++i) LOGND(grid.substr(i * width, width));
-		exit(0);
+		ogrid[x + y * width] = 'X';
+		//for (int i = 0; i < width; ++i) LOGND(ogrid.substr(i * width, width));
+		return true;
 	}
-	grid[x + y * width] = '0' + steps % 10;
+	ogrid[x + y * width] = '0' + steps % 10;
 	if (x) next.push_back({x - 1, y});
 	if (x < width - 1) next.push_back({x + 1, y});
 	if (y) next.push_back({x, y - 1});
 	if (y - width - 1) next.push_back({x, y + 1});
+	return false;
+}
+
+static bool reachableExit( void )
+{
+	vector<array<int, 2>> next{{0, 0}}, onext;
+	int steps = 0;
+	ogrid = grid;
+	for (bool flip = false; !(flip ? onext : next).empty(); flip = !flip, ++steps) {
+		for (auto [x, y] : flip ? onext : next) if (solve(x, y, steps, flip ? next : onext)) return true;
+		(flip ? onext : next).clear();
+	}
+    return false;
 }
 
 int main( void )
@@ -37,15 +50,15 @@ int main( void )
 		grid[x + y * width] = '#';
 	}
 	for (int i = 0; i < width; ++i) LOGND(grid.substr(i * width, width));
-	int cnt = 0;
-	for (auto c : grid) cnt += c == '#';
-	LOGND("cnt " << cnt << " # found") << endl;
 
-	vector<array<int, 2>> next{{0, 0}}, onext;
-	int steps = 0;
-	for (bool flip = false; !(flip ? onext : next).empty(); flip = !flip, ++steps) {
-		for (auto [x, y] : flip ? onext : next) solve(x, y, steps, flip ? next : onext);
-		(flip ? onext : next).clear();
+	while (!cin.eof()) {
+		int x, y;
+		cin >> x; cin.ignore(1, ' ');
+		cin >> y;
+		grid[x + y * width] = '#';
+		if (!reachableExit()) {
+			OUT(x << ',' << y << endl);
+			break ;
+		}
 	}
-    OUT("EXIT NOT FOUND" << endl);
 }
