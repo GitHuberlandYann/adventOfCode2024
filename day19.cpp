@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <string.h>
+#include <map>
 
 #define OUT(x) cout << x
 #define LOG(x) cerr << x
@@ -10,20 +11,20 @@
 
 using namespace std;
 vector<string> towels;
-string memory;
+map<int, long> memory;
 
-static bool solve( string& pattern, int cursor )
+static long solve( string& pattern, int cursor )
 {
-	if (memory[cursor] == '1') return false;
-    if (!pattern[cursor]) return true;
+	if (memory.count(cursor)) return memory[cursor];
+    if (!pattern[cursor]) return 1;
 
-	memory[cursor] = '1';
+	long res = 0;
     for (auto& tow : towels) {
         if (!strncmp(tow.c_str(), &pattern[cursor], tow.size())) {
-            if (solve(pattern, cursor + tow.size())) return true;
+            res += solve(pattern, cursor + tow.size());
         }
     }
-    return false;
+	return memory[cursor] = res;
 }
 
 int main( void )
@@ -32,10 +33,10 @@ int main( void )
 	for (cin >> str; str.back() == ','; cin >> str) str.pop_back(), towels.push_back(str);
 	towels.push_back(str);
 	cin.ignore(); cin.ignore();
-    int res = 0;
+    long res = 0;
 	while (getline(cin, str)) {
-		memory = string(str.size(), '0');
-        if (solve(str, 0)) ++res;
+		memory.clear();
+        res += solve(str, 0);
     }
 
     OUT(res << endl);
