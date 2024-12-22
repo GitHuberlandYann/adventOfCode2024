@@ -12,7 +12,7 @@ using namespace std;
 static void genSecret( long& secret )
 {
 	secret = (secret ^ (secret << 6)) % 16777216;
-	secret = (secret ^ int(floor(secret / 32.f))) % 16777216;
+	secret = (secret ^ (secret >> 5)) % 16777216;
 	secret = (secret ^ (secret << 11)) % 16777216;
 }
 
