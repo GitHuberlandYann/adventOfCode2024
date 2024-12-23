@@ -27,11 +27,23 @@ int main( void )
 			if (cos[right].count(left)) trios.insert({key, left, right});
 	LOGND("nbr trios: " << trios.size());
 
-	long res = 0;
-	for (auto& trio : trios) for (auto& s : trio) if (s.front() == 't') {
-		++res;
-		break ;
+	long biggestGroupCnt = 0, groupCnt = 0;
+	string biggestGroupKey, currentKey;
+	for (auto& trio : trios) {
+		auto& key = *trio.begin();
+		if (key == currentKey) ++groupCnt;
+		else {
+			if (groupCnt > biggestGroupCnt) biggestGroupCnt = groupCnt, biggestGroupKey = currentKey;
+			currentKey = key, groupCnt = 0;
+		}
+	}
+	LOGND("biggestGroupCnt: " << biggestGroupCnt << " with key " << biggestGroupKey);
+
+	set<string> res{biggestGroupKey};
+	for (auto& trio : trios) if (*trio.begin() == biggestGroupKey) {
+		res.insert(trio.begin(), trio.end());
 	}
 
-    OUT(res << endl);
+    for (auto& s : res) OUT(s << ',');
+	OUT(endl);
 }
