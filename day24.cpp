@@ -1,7 +1,5 @@
 #include <iostream>
-#include <vector>
 #include <map>
-#include <algorithm>
 
 #define OUT(x) cout << x
 #define LOG(x) cerr << x
@@ -16,8 +14,8 @@ map<string, gate> gates;
 static void solve( const string& str )
 {
 	if (codex.count(str)) return ;
-	if (!codex.count(gates[str].left)) solve(gates[str].left);
-	if (!codex.count(gates[str].right)) solve(gates[str].right);
+	solve(gates[str].left);
+	solve(gates[str].right);
 	switch (gates[str].op.front()) {
 		case 'A': codex[str] = codex[gates[str].left] & codex[gates[str].right]; break ;
 		case 'O': codex[str] = codex[gates[str].left] | codex[gates[str].right]; break ;
@@ -38,9 +36,35 @@ int main( void )
 		gates[line] = ngate;
 	}
 
-	for (auto& [key, cond] : gates) solve(key);
-
+	// part 1
 	long res = 0;
-	for (auto& [key, boo] : codex) if (key.front() == 'z' && boo) res |= (1L << atoi(&key[1])); 
-    OUT(res << endl);
+	for (auto& [key, cond] : gates) {
+		if (key.front() != 'z') continue ;
+		solve(key);
+		if (codex[key]) res |= (1L << atoi(&key[1]));
+	}
+	OUT(res << endl);
 }
+
+/*
+How to solve part2:
+
+1. understand that we are dealing with a full adder https://en.wikipedia.org/wiki/Adder_(electronics)#Full_adder
+2. display schema of full adder:
+
+A --------+----+
+          |    XOR --------+
+B -----+--#----+     |    |
+       |  |          |   XOR ----- S
+       |  |          |    |
+       |  |          +----#-----+
+       |  |               |    AND ----+
+Cin ---#--#---------------+-----+      |
+       |  |                            OR --- Cout
+	   |  +---------------------+      |
+       |                       AND ----+
+	   +------------------------+
+
+3. ...
+4. I resolved it by hand :)
+*/
