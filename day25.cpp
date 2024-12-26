@@ -48,3 +48,5 @@ int main( void )
 	}
     OUT(res << endl);
 }
+
+// .. no part 2 :)
